@@ -2,12 +2,8 @@ import { createSlice } from "@reduxjs/toolkit";
 
 
 const initialState = {
-    // data: { account: JSON.parse(localStorage.getItem("account")) || null, balance: JSON.parse(localStorage.getItem("balance")) || null },
-    // account: JSON.parse(localStorage.getItem("account")) || null,
-    // balance: JSON.parse(localStorage.getItem("balance")) || null,
-    account: null,
-    balance: null,
-    contract: null,
+    account: JSON.parse(localStorage.getItem("account")) || null,
+    balance: JSON.parse(localStorage.getItem("balance")) || null,
     isFetching: false,
     error: false,
 
@@ -17,17 +13,25 @@ export const walletSlice = createSlice({
     name: "wallet",
     initialState,
     reducers: {
-        getEther: (state, acction) => {
-            state.contract = acction.payload
-        },
-        walletConnect: (state, acction) => {
+        walletConnect: (state, action) => {
             state.isFetching = true;
-            state.account = acction.payload;
+            state.account = action.payload;
             localStorage.setItem('account', JSON.stringify(state.account))
         },
+        getBalance: (state, action) => {
+            state.balance = action.payload;
+            localStorage.setItem('balance', JSON.stringify(state.balance))
+        },
+        remove: (state, action) => {
+            state.account = null;
+            state.balance = null;
+            localStorage.setItem('account', JSON.stringify(state.account))
+            localStorage.setItem('balance', JSON.stringify(state.balance))
+
+        }
 
     }
 })
 
-export const { getEther, walletConnect } = walletSlice.actions;
+export const { walletConnect, getBalance, remove } = walletSlice.actions;
 export default walletSlice.reducer;

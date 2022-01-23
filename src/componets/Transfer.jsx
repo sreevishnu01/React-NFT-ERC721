@@ -1,64 +1,80 @@
-import { ethers } from 'ethers';
 import React, { useEffect, useState } from 'react';
+import { ethers } from 'ethers';
 
 function Transfer(props) {
 
     const [tokens, setTokens] = useState([]);
-    const [tokenId, setTokenId] = useState();
+    const [tokenId, setTokenId] = useState({ id: null });
     const [reciver, setReciver] = useState();
-
     const [error, setError] = useState(null);
-
-
+    const [loading, setLoading] = useState(false);
 
     const handelChange = (e) => {
-        setTokenId(e.target.value)
+
+        let tkn = e.target.value;
+        setTokenId(tokens[tkn])
+        console.log(tokens[tkn])
     }
 
     const transferNFT = async () => {
+
         setError(null)
-        const contract = props.data.etherData.contract;
-        const account = props.data.reduxData.account;
+        const contract = props.etherData.contract;
+        const account = props.etherData.account;
+        const tkn = tokenId.id
         try {
             if (!window.ethereum)
                 throw new Error('metamask not found..');
             ethers.utils.getAddress(reciver);
-            // const tx = await contract.safeTransferFrom({
-            //     address: account,
-            //     address: reciver,
-            //     uint256: tokenId
-            // });
-            const tx = contract["safeTransferFrom(address,address,uint256)"](account, reciver, tokenId);
-            console.log(tx)
+            const tx = await contract["safeTransferFrom(address,address,uint256)"](account, reciver, tkn);
+            if (tx) {
+                setError(tx.hash)
+                test();
+            }
         } catch (err) {
             setError(err.message);
+            console.log(err)
         }
     }
-    // console.log(tokenId)
+    const test = () => {
+        const contract = props.etherData.contract;
+        const account = props.etherData.account;
+        props.methods.updateBalance(account, contract);
+    }
 
 
     useEffect(() => {
-        const contract = props.data.etherData.contract;
-        const account = props.data.reduxData.account;
+        const contract = props.etherData.contract;
+        const account = props.etherData.account;
+        const balance = props.etherData.balance;
         const updateOwnTokens = async () => {
             // await ERC721.methods.userOwnedTokens.call(walletAddress)
             // let result = await contract.userOwnedTokens.call(account);
             try {
-                if (account) {
-                    let index = 0
+                if (account && contract) {
+                    setLoading(true)
+                    let index = 0;
                     let result = [];
-                    while (index < 20) {
+                    while (index < balance) {
                         const data = await contract.tokenOfOwnerByIndex(account, index);
                         const data1 = await contract.tokenURI(data)
                         let number = data.toNumber()
-                        const resultObj = { name: data1, tokenId: number }
+                        const resultObj = { name: data1, id: number }
                         result.push(resultObj);
                         index++;
                     }
                     setTokens(result);
+                    if (result.length !== 0) {
+                        props.etherData.setLoading(false);
+                        setLoading(false)
+                    }
                 }
             } catch (err) {
-                // setError(err)
+                setError(err)
+                console.log(err)
+            }
+            finally {
+
             }
 
         }
@@ -68,15 +84,20 @@ function Transfer(props) {
 
     return <div>
         <div className="content">
-            <div className='items' >
-                {tokens.map((e, key) => (
-                    <div key={key}>
-                        <input type="radio" value={e.tokenId} checked={tokenId == e.tokenId ? true : false} onChange={handelChange} />
-                        <label htmlFor="check">{e.name}</label>
-                    </div>
+            {props.etherData.loading || loading ? (<>
+                <h2>loading...</h2>
+            </>) : (
+                <div className='items' >
+                    {tokens.map((e, key) => (
+                        <div key={key}>
+                            <input type="radio" value={key} checked={tokenId.id === e.id ? true : false} onChange={handelChange} />
+                            <label htmlFor="check">{e.name}</label>
+                        </div>
 
-                ))}
-            </div>
+                    ))}
+                </div>
+            )}
+
             <div className='form-container'>
                 <input type="text" onChange={e => setReciver(e.target.value)} />
                 <button onClick={transferNFT}>Transfer NFT</button>
@@ -87,9 +108,10 @@ function Transfer(props) {
                         </p>
                     ) : (<></>)}
                 </div>
+                <button onClick={test}>balnce update</button>
             </div>
         </div>
-    </div>;
+    </div >;
 }
 
 export default Transfer;
