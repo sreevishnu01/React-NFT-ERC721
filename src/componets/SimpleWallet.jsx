@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import './simple.css';
 import { ethers } from 'ethers';
 import { ABI } from '../Assets/ABI';
 // import useConnect from '../customhooks/useConnect';
@@ -8,12 +7,10 @@ function SimpleWallet() {
     // env
     const contractAddress = process.env.REACT_APP_CONTRACT_ADDRESS;
     const token_ABI = ABI;
-    // express salute fog program result grit hybrid lucky elephant edgeactachieve
 
     const [account, setAccount] = useState(null);
+    const [balance, setBalance] = useState(null);
     const [tokenName, setTokenName] = useState(null);
-    const [balance, setBalance] = useState([]);
-    // const [connection, setConnection] = useState('connect');
     const [tokens, setTokens] = useState([]);
     const [error, setError] = useState(null);
 
@@ -32,12 +29,9 @@ function SimpleWallet() {
                 updateBalance(result[0]);
                 updateOwnTokens(result[0]);
             }
-
-
         } catch (err) {
             setError(err.message);
         }
-
     }
     const handelDisconnect = () => {
         if (account) {
@@ -92,8 +86,8 @@ function SimpleWallet() {
             let tempContract = new ethers.Contract(contractAddress, token_ABI, tempProvider);
 
             setContract(tempContract);
-            setProvider(tempProvider);
-            setSigner(tempSigner);
+            // setProvider(tempProvider);
+            // setSigner(tempSigner);
             console.log('ehter')
 
         }
