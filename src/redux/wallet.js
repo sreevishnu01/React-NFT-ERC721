@@ -4,9 +4,6 @@ import { createSlice } from "@reduxjs/toolkit";
 const initialState = {
     account: JSON.parse(localStorage.getItem("account")) || null,
     balance: JSON.parse(localStorage.getItem("balance")) || null,
-    isFetching: false,
-    error: false,
-
 }
 
 export const walletSlice = createSlice({

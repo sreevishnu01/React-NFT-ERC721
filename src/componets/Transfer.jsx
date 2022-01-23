@@ -18,28 +18,47 @@ function Transfer(props) {
 
     const transferNFT = async () => {
 
-        setError(null)
+        setError(null);
+        setLoading(true);
         const contract = props.etherData.contract;
         const account = props.etherData.account;
         const tkn = tokenId.id
         try {
+            // metamask
             if (!window.ethereum)
                 throw new Error('metamask not found..');
             ethers.utils.getAddress(reciver);
             const tx = await contract["safeTransferFrom(address,address,uint256)"](account, reciver, tkn);
             if (tx) {
                 setError(tx.hash)
-                test();
+                // change state of balnce and tokens
+                const bln = props.etherData.balance;
+                const repet = async () => {
+                    const curentBln = await valueChange();
+                    if (curentBln === bln) {
+                        setTimeout(() => {
+                            repet();
+                        }, 5000)
+                    }
+                    if (curentBln !== bln) {
+                        alert('succsfully transfed');
+                        setLoading(false);
+                    }
+                }
+                await repet();
             }
         } catch (err) {
             setError(err.message);
             console.log(err)
         }
+        finally {
+            setLoading(false);
+        }
     }
-    const test = () => {
+    const valueChange = () => {
         const contract = props.etherData.contract;
         const account = props.etherData.account;
-        props.methods.updateBalance(account, contract);
+        return props.methods.updateBalance(account, contract);
     }
 
 
@@ -48,8 +67,6 @@ function Transfer(props) {
         const account = props.etherData.account;
         const balance = props.etherData.balance;
         const updateOwnTokens = async () => {
-            // await ERC721.methods.userOwnedTokens.call(walletAddress)
-            // let result = await contract.userOwnedTokens.call(account);
             try {
                 if (account && contract) {
                     setLoading(true)
@@ -84,21 +101,19 @@ function Transfer(props) {
 
     return <div>
         <div className="content">
-            {props.etherData.loading || loading ? (<>
-                <h2>loading...</h2>
-            </>) : (
-                <div className='items' >
-                    {tokens.map((e, key) => (
-                        <div key={key}>
-                            <input type="radio" value={key} checked={tokenId.id === e.id ? true : false} onChange={handelChange} />
-                            <label htmlFor="check">{e.name}</label>
-                        </div>
 
-                    ))}
-                </div>
-            )}
+            <div className='items' >
+                {tokens.map((e, key) => (
+                    <div key={key}>
+                        <input type="radio" value={key} checked={tokenId.id === e.id ? true : false} onChange={handelChange} />
+                        <label htmlFor="check">{e.name}</label>
+                    </div>
+
+                ))}
+            </div>
 
             <div className='form-container'>
+                <label htmlFor="text">Reciver address</label>
                 <input type="text" onChange={e => setReciver(e.target.value)} />
                 <button onClick={transferNFT}>Transfer NFT</button>
                 <div className="error">
@@ -108,7 +123,9 @@ function Transfer(props) {
                         </p>
                     ) : (<></>)}
                 </div>
-                <button onClick={test}>balnce update</button>
+                {props.etherData.loading || loading ? (<>
+                    <h2>loading...</h2>
+                </>) : (<></>)}
             </div>
         </div>
     </div >;

@@ -2,7 +2,6 @@ import { ethers } from 'ethers';
 import React, { useEffect, useState } from 'react';
 import { ABI } from './Assets/ABI';
 import Home from "./componets/Home";
-// import SimpleWallet from "./componets/SimpleWallet";
 
 function App() {
   // ether
@@ -24,7 +23,6 @@ function App() {
 
   return (
     <>
-      {/* <SimpleWallet /> */}
       <Home contract={contract} />
 
     </>

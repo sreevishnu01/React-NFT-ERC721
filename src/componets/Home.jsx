@@ -54,6 +54,7 @@ function Home(props) {
             const bln = balanceBig.toNumber()
             setBalance(bln)
             dispatch(getBalance(bln));
+            return bln
         } catch (error) {
             setError(error)
         }
