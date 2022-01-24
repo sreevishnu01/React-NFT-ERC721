@@ -1,13 +1,13 @@
 {
   "files": {
     "main.css": "/React-NFT-ERC721/static/css/main.99f8b5ac.css",
-    "main.js": "/React-NFT-ERC721/static/js/main.f9217a01.js",
+    "main.js": "/React-NFT-ERC721/static/js/main.f75f8b34.js",
     "index.html": "/React-NFT-ERC721/index.html",
     "main.99f8b5ac.css.map": "/React-NFT-ERC721/static/css/main.99f8b5ac.css.map",
-    "main.f9217a01.js.map": "/React-NFT-ERC721/static/js/main.f9217a01.js.map"
+    "main.f75f8b34.js.map": "/React-NFT-ERC721/static/js/main.f75f8b34.js.map"
   },
   "entrypoints": [
     "static/css/main.99f8b5ac.css",
-    "static/js/main.f9217a01.js"
+    "static/js/main.f75f8b34.js"
   ]
 }
