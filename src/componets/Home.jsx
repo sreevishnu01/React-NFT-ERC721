@@ -35,6 +35,7 @@ function Home(props) {
 
         } catch (err) {
             setError(err.message);
+            setLoading(false);
         }
 
     }
