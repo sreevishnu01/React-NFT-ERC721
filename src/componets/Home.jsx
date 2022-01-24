@@ -13,7 +13,7 @@ function Home(props) {
     const [ac, setAc] = useState(wallet.account);
     const [balance, setBalance] = useState(wallet.balance);
     const [error, setError] = useState(null);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(wallet.isLoading);
 
     // ethers
     const contract = props.contract;
@@ -30,7 +30,6 @@ function Home(props) {
             const result = await window.ethereum.request({ method: 'eth_requestAccounts' })
             if (result) {
                 dispatch(walletConnect(result[0]));
-                updateBalance(result[0]);
                 setAc(result[0])
             }
 
@@ -49,14 +48,16 @@ function Home(props) {
 
     // balance
     const updateBalance = async (account) => {
-        try {
-            let balanceBig = await contract.balanceOf(account);
-            const bln = balanceBig.toNumber()
-            setBalance(bln)
-            dispatch(getBalance(bln));
-            return bln
-        } catch (error) {
-            setError(error)
+        if (account !== null && contract !== null) {
+            try {
+                let balanceBig = await contract.balanceOf(account);
+                const bln = balanceBig.toNumber()
+                setBalance(bln)
+                dispatch(getBalance(bln));
+                return bln
+            } catch (error) {
+                setError(error)
+            }
         }
     }
     const methods = {

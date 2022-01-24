@@ -5,23 +5,26 @@ function Transfer(props) {
 
     const [tokens, setTokens] = useState([]);
     const [tokenId, setTokenId] = useState({ id: null });
-    const [reciver, setReciver] = useState();
+    const [reciver, setReciver] = useState(null);
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(false);
 
-    const handelChange = (e) => {
+    // props
+    const contract = props.etherData.contract;
+    const account = props.etherData.account;
+    const balance = props.etherData.balance;
 
+
+    const handelChange = (e) => {
         let tkn = e.target.value;
         setTokenId(tokens[tkn])
-        console.log(tokens[tkn])
     }
 
-    const transferNFT = async () => {
-
+    const transferNFT = async (e) => {
+        e.preventDefault();
         setError(null);
+        props.etherData.setLoading(true);
         setLoading(true);
-        const contract = props.etherData.contract;
-        const account = props.etherData.account;
         const tkn = tokenId.id
         try {
             // metamask
@@ -32,17 +35,15 @@ function Transfer(props) {
             if (tx) {
                 setError(tx.hash)
                 // change state of balnce and tokens
-                const bln = props.etherData.balance;
                 const repet = async () => {
                     const curentBln = await valueChange();
-                    if (curentBln === bln) {
+                    if (curentBln === balance) {
                         setTimeout(() => {
                             repet();
                         }, 5000)
                     }
-                    if (curentBln !== bln) {
+                    if (curentBln !== balance) {
                         alert('succsfully transfed');
-                        setLoading(false);
                     }
                 }
                 await repet();
@@ -53,22 +54,24 @@ function Transfer(props) {
         }
         finally {
             setLoading(false);
+            props.etherData.setLoading(false);
+            setTokenId({ id: null });
         }
     }
     const valueChange = () => {
-        const contract = props.etherData.contract;
-        const account = props.etherData.account;
         return props.methods.updateBalance(account, contract);
     }
 
 
     useEffect(() => {
+        // props
         const contract = props.etherData.contract;
         const account = props.etherData.account;
         const balance = props.etherData.balance;
+
         const updateOwnTokens = async () => {
-            try {
-                if (account && contract) {
+            if (account !== null && contract !== null) {
+                try {
                     setLoading(true)
                     let index = 0;
                     let result = [];
@@ -85,17 +88,15 @@ function Transfer(props) {
                         props.etherData.setLoading(false);
                         setLoading(false)
                     }
+                } catch (err) {
+                    setError(err)
+                    console.log(err)
                 }
-            } catch (err) {
-                setError(err)
-                console.log(err)
-            }
-            finally {
 
             }
-
         }
         updateOwnTokens();
+        props.methods.updateBalance(account);
 
     }, [props])
 
